@@ -18,8 +18,8 @@ impl Matrix {
 
 	pub fn copy(&self) -> Matrix {
 		let mut m = Matrix::new(self.rows, self.columns);
-		for i in 0..self.rows {
-			for j in 0..self.columns {
+		for i in 0..self.columns {
+			for j in 0..self.rows {
 				m.data[i][j] = self.data[i][j];
 			}
 		}
@@ -27,8 +27,8 @@ impl Matrix {
 	}
 
 	pub fn map(&mut self, f: &dyn Fn(f32, usize, usize) -> f32) -> &Matrix {
-		for i in 0..self.rows-1 {
-			for j in 0..self.columns-1 {
+		for i in 0..self.columns {
+			for j in 0..self.rows {
 				self.data[i][j] = f(self.data[i][j], i, j);
 			}
 		}
@@ -37,23 +37,15 @@ impl Matrix {
 
 	pub fn randomized(rows: usize, columns: usize) -> Matrix {
 		let mut m = Matrix::new(rows, columns);
-		m.map(&|_,_,_| rand::random::<f32>());
+		m.map(&|_,_,_| rand::random::<f32>()*2.0 - 1.0);
 		m
 	}
 
-	pub fn add(&self, b: Matrix) {
-		
-	}
-
-	pub fn multiplyMat(&self, b: Matrix) {
-
-	}
-
-	pub fn multiplyVec(&self, b: Vec<f32>) -> Vec<f32> {
+	pub fn multiply(&self, b: Vec<f32>) -> Vec<f32> {
 		let mut vec = Vec::with_capacity(self.columns.try_into().unwrap());
-		for i in 0..self.rows {
+		for i in 0..self.columns {
 			let mut s = 0.0;
-			for j in 0..self.columns {
+			for j in 0..self.rows {
 				s += self.data[i][j];
 			vec.push(b[i] * s);
 			}

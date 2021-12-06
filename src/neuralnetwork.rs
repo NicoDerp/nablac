@@ -1,7 +1,41 @@
 use crate::matrix::Matrix;
+use std::fmt;
 
-pub struct ActivationFunction {
+pub trait ActivationFunction {
+	fn func(n: f32) -> f32;
+	fn dfunc(n: f32) -> f32;
+}
 
+struct Sigmoid {}
+struct ReLU {}
+
+impl ActivationFunction for Sigmoid {
+	fn func(n: f32) -> f32 {
+		1.0 / (1.0 + std::f32::consts::E.powf(-n))
+	}
+
+	fn dfunc(n: f32) -> f32 {
+		n*(1.0-n)
+	}
+}
+
+impl ActivationFunction for ReLU {
+	fn func(n: f32) -> f32 {
+		if n>0.0 {
+			n
+		} else {
+			0.0
+		}
+	}
+
+	fn dfunc(n: f32) -> f32 {
+		if n>0.0 {
+			1.0
+		} else {
+			0.0
+		}
+	}
+	
 }
 
 struct Layer {
@@ -31,6 +65,8 @@ pub struct NeuralNetwork {
 	input_layer: Vec<f32>,
 	hidden_layer: Layer,
 	output_layer: Layer,
+	//data_set: DataSet,
+	//activation_function: ActivationFunction,
 }
 
 impl NeuralNetwork {
@@ -39,10 +75,31 @@ impl NeuralNetwork {
 			input_layer: Vec::with_capacity(input_size.try_into().unwrap()),
 			hidden_layer: Layer::new(hidden_size.unwrap_or(24), input_size),
 			output_layer: Layer::new(output_size, hidden_size.unwrap_or(24)),
+			//activation_function: func.unwrap_or(),
 		}
 	}
 
-	pub fn getHiddenWeights(&self) -> &Matrix {
-		&self.hidden_layer.weights
+	pub fn loadDataSet() {
+
+	}
+
+	fn _serealize(&self) {
+
+	}
+
+	fn _deserealize() {
+
+	}
+
+	pub fn info(&mut self) {
+		self.hidden_layer.neurons.push(5.0);
+		self.hidden_layer.neurons[0] = 4.0;
+		println!("{}, {}, {}", self.input_layer.len(), self.hidden_layer.size(), self.output_layer.size());
+	}
+}
+
+impl fmt::Display for NeuralNetwork {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "Input-layer size: {}\nHidden-layer size: {}\nOutut-layer size: {}\nActivation function: idk", self.input_layer.len(), self.hidden_layer.size(), self.output_layer.size())
 	}
 }
