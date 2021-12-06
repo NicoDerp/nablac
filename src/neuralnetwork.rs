@@ -1,5 +1,4 @@
-use crate::matrix;
-use rand;
+use crate::matrix::Matrix;
 
 pub struct ActivationFunction {
 
@@ -15,24 +14,17 @@ struct Layer {
 }
 
 impl Layer {
-	pub fn size(&self) -> i32 {
-		neurons.len()
+	pub fn size(&self) -> usize {
+		self.neurons.len()
 	}
 
-	pub fn new(&self, layer_size: i32, last_layer_size: i32) {
+	pub fn new(layer_size: i32, last_layer_size: i32) -> Self {
 		Layer {
-			neurons: Vec::with_capacity(layer_size),
-			weights: Matrix::new(last_layer, layer.size()),
-			biases: Vec::with_capacity(layer_size),
+			neurons: Vec::with_capacity(layer_size.try_into().unwrap()),
+			weights: Matrix::randomized(last_layer_size.try_into().unwrap(), layer_size.try_into().unwrap()),
+			biases: Vec::with_capacity(layer_size.try_into().unwrap()),
 		}
 	}
-
-	fn createRandomWeightMatrix(rows: i32, columns: i32) -> Matrix {
-		Matrix::new(rows, columns).map() //  Random function
-	}
-
-	fn randomval() -> f32
-
 }
 
 pub struct NeuralNetwork {
@@ -43,11 +35,14 @@ pub struct NeuralNetwork {
 
 impl NeuralNetwork {
 	pub fn new(input_size: i32, hidden_size: Option<i32>, output_size: i32) -> Self {
-		let m = matrix::Matrix::new(2, 4);
 		NeuralNetwork {
-			input_layer: Vec::with_capacity(input_size),
-			hidden_layer: Layer::new(hidden_size.unwrap_or(0), input_size),
-			output_layer:
+			input_layer: Vec::with_capacity(input_size.try_into().unwrap()),
+			hidden_layer: Layer::new(hidden_size.unwrap_or(24), input_size),
+			output_layer: Layer::new(output_size, hidden_size.unwrap_or(24)),
 		}
+	}
+
+	pub fn getHiddenWeights(&self) -> &Matrix {
+		&self.hidden_layer.weights
 	}
 }
