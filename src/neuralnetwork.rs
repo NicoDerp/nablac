@@ -79,6 +79,10 @@ impl NeuralNetwork {
 		}
 	}
 
+/**
+ * @todo Finish architecture of dataset format
+ * @body After that I need to implement loading of data.
+ */
 	pub fn loadDataSet() {
 
 	}
