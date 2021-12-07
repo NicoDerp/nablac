@@ -2,25 +2,25 @@ use crate::matrix::Matrix;
 use std::fmt;
 
 pub trait ActivationFunction {
-	fn func(n: f32) -> f32;
-	fn dfunc(n: f32) -> f32;
+	fn func(&self, n: f32) -> f32;
+	fn dfunc(&self, n: f32) -> f32;
 }
 
-struct Sigmoid {}
-struct ReLU {}
+pub struct Sigmoid {}
+pub struct ReLU {}
 
 impl ActivationFunction for Sigmoid {
-	fn func(n: f32) -> f32 {
+	fn func(&self, n: f32) -> f32 {
 		1.0 / (1.0 + std::f32::consts::E.powf(-n))
 	}
 
-	fn dfunc(n: f32) -> f32 {
+	fn dfunc(&self, n: f32) -> f32 {
 		n*(1.0-n)
 	}
 }
 
 impl ActivationFunction for ReLU {
-	fn func(n: f32) -> f32 {
+	fn func(&self, n: f32) -> f32 {
 		if n>0.0 {
 			n
 		} else {
@@ -28,7 +28,7 @@ impl ActivationFunction for ReLU {
 		}
 	}
 
-	fn dfunc(n: f32) -> f32 {
+	fn dfunc(&self, n: f32) -> f32 {
 		if n>0.0 {
 			1.0
 		} else {
@@ -45,11 +45,13 @@ struct Layer {
 	weights: Matrix,
 	// The biases for the individual neurons
 	biases: Vec<f32>,
+	// Size of neurons
+	size: i32,
 }
 
 impl Layer {
-	pub fn size(&self) -> usize {
-		self.neurons.len()
+	pub fn size(&self) -> i32 {
+		self.size
 	}
 
 	pub fn new(layer_size: i32, last_layer_size: i32) -> Self {
@@ -57,7 +59,22 @@ impl Layer {
 			neurons: Vec::with_capacity(layer_size.try_into().unwrap()),
 			weights: Matrix::randomized(last_layer_size.try_into().unwrap(), layer_size.try_into().unwrap()),
 			biases: Vec::with_capacity(layer_size.try_into().unwrap()),
+			size: layer_size,
 		}
+	}
+}
+
+struct Dataset {
+	//info:
+}
+
+impl Dataset {
+	fn new() -> Self {
+		Dataset {}
+	}
+
+	fn load() {
+
 	}
 }
 
@@ -66,16 +83,16 @@ pub struct NeuralNetwork {
 	hidden_layer: Layer,
 	output_layer: Layer,
 	//data_set: DataSet,
-	//activation_function: ActivationFunction,
+	activation_function: Box<dyn ActivationFunction>,
 }
 
 impl NeuralNetwork {
-	pub fn new(input_size: i32, hidden_size: Option<i32>, output_size: i32) -> Self {
+	pub fn new(input_size: i32, hidden_size: Option<i32>, output_size: i32, func: Option<Box<dyn ActivationFunction>>) -> Self {
 		NeuralNetwork {
 			input_layer: Vec::with_capacity(input_size.try_into().unwrap()),
 			hidden_layer: Layer::new(hidden_size.unwrap_or(24), input_size),
 			output_layer: Layer::new(output_size, hidden_size.unwrap_or(24)),
-			//activation_function: func.unwrap_or(),
+			activation_function: func.unwrap_or(Box::new(ReLU{})),
 		}
 	}
 
@@ -83,7 +100,7 @@ impl NeuralNetwork {
  * @todo Finish architecture of dataset format
  * @body After that I need to implement loading of data.
  */
-	pub fn loadDataSet() {
+	pub fn _load_data_set(&self) {
 
 	}
 
@@ -98,6 +115,9 @@ impl NeuralNetwork {
 	pub fn info(&mut self) {
 		self.hidden_layer.neurons.push(5.0);
 		self.hidden_layer.neurons[0] = 4.0;
+		for i in 0..10 {
+			println!("{}, {}", i, self.activation_function.func(i as f32));
+		}
 		println!("{}, {}, {}", self.input_layer.len(), self.hidden_layer.size(), self.output_layer.size());
 	}
 }
