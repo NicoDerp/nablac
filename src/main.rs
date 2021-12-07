@@ -3,9 +3,7 @@ mod matrix;
 
 fn main() {
 	let mut neuralnet = neuralnetwork::NeuralNetwork::new(
-		10,
-		4,
-		2,
+		vec![10, 4, 2],
 		None
 	);
 

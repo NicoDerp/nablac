@@ -86,11 +86,13 @@ impl Dataset {
 }
 
 pub struct NeuralNetwork {
-	input_layer: Layer,
-	ih_weights: Matrix,
-	hidden_layer: Layer,
-	ho_weights: Matrix,
-	output_layer: Layer,
+	layers: Vec<Layer>,
+	weights: Vec<Matrix>,
+	//input_layer: Layer,
+	//ih_weights: Matrix,
+	//hidden_layer: Layer,
+	//ho_weights: Matrix,
+	//output_layer: Layer,
 	//data_set: DataSet,
 	activation_function: Box<dyn ActivationFunction>,
 }
@@ -99,13 +101,20 @@ pub struct NeuralNetwork {
  * @body For layers, there will be n-2 hidden layers, and n-1 weights
  */
 impl NeuralNetwork {
-	pub fn new(input_size: i32, hidden_size: i32, output_size: i32, func: Option<Box<dyn ActivationFunction>>) -> Self {
+	pub fn new(layer_neurons: Vec<i32>, func: Option<Box<dyn ActivationFunction>>) -> Self {
+		let mut l = Vec::new();
+		for i in 0..layer_neurons {
+			vec.push(Layer::new(layer_neurons[i]));
+		}
+
+		for mut w = Vec::new();
+		for i in 1..layer_neurons-1 {
+			w.push(Matrix::randomized(layer_neurons[i-1], layer_neurons[i]));
+		}
+
 		NeuralNetwork {
-			input_layer: Layer::new(input_size),
-			ih_weights: Matrix::randomized(input_size, hidden_size),
-			hidden_layer: Layer::new(hidden_size),
-			ho_weights: Matrix::randomized(hidden_size, output_size),
-			output_layer: Layer::new(output_size),
+			layers: l,
+			weights: w,
 			activation_function: func.unwrap_or(Box::new(ReLU{})),
 		}
 	}
