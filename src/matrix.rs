@@ -35,20 +35,20 @@ impl Matrix {
 		self
 	}
 
-	pub fn randomized(rows: usize, columns: usize) -> Matrix {
-		let mut m = Matrix::new(rows, columns);
+	pub fn randomized(rows: i32, columns: i32) -> Matrix {
+		let mut m = Matrix::new(rows.try_into().unwrap(), columns.try_into().unwrap());
 		m.map(&|_,_,_| rand::random::<f32>()*2.0 - 1.0);
 		m
 	}
 
-	pub fn multiply(m: Matrix, b: Vec<f32>) -> Vec<f32> {
+	pub fn multiply(m: &Matrix, b: &Vec<f32>) -> Vec<f32> {
 		let mut vec = Vec::with_capacity(m.columns.try_into().unwrap());
 		for i in 0..m.columns {
 			let mut s = 0.0;
 			for j in 0..m.rows {
 				s += m.data[i][j];
-			vec.push(b[i] * s);
 			}
+			vec.push(b[i] * s);
 		}
 		return vec;
 	}
