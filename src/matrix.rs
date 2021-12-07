@@ -41,12 +41,12 @@ impl Matrix {
 		m
 	}
 
-	pub fn multiply(&self, b: Vec<f32>) -> Vec<f32> {
-		let mut vec = Vec::with_capacity(self.columns.try_into().unwrap());
-		for i in 0..self.columns {
+	pub fn multiply(m: Matrix, b: Vec<f32>) -> Vec<f32> {
+		let mut vec = Vec::with_capacity(m.columns.try_into().unwrap());
+		for i in 0..m.columns {
 			let mut s = 0.0;
-			for j in 0..self.rows {
-				s += self.data[i][j];
+			for j in 0..m.rows {
+				s += m.data[i][j];
 			vec.push(b[i] * s);
 			}
 		}

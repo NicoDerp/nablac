@@ -30,6 +30,7 @@ name = "nablac"
 version = "0.1.0"
 dependencies = [
  "rand",
+ "serde",
 ]
 
 [[package]]
@@ -77,6 +78,12 @@ checksum = "d51e9f596de227fda2ea6c84607f5558e196eeaf43c986b724ba4fb8fdf497e7"
 dependencies = [
  "rand_core",
 ]
+
+[[package]]
+name = "serde"
+version = "1.0.130"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f12d06de37cf59146fbdecab66aa99f9fe4f78722e3607577a5375d66bd0c913"
 
 [[package]]
 name = "wasi"

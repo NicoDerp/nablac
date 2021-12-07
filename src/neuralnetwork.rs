@@ -96,6 +96,14 @@ impl NeuralNetwork {
 		}
 	}
 
+	pub fn get_hidden_weights(&mut self) -> &Matrix {
+		&self.hidden_layer.weights
+	}
+
+	pub fn get_inputs(&mut self) -> &Vec<f32> {
+		&self.input_layer
+	}
+
 /**
  * @todo Finish architecture of dataset format
  * @body After that I need to implement loading of data.
@@ -112,12 +120,11 @@ impl NeuralNetwork {
 
 	}
 
+	pub fn next(&self) {
+
+	}
+
 	pub fn info(&mut self) {
-		self.hidden_layer.neurons.push(5.0);
-		self.hidden_layer.neurons[0] = 4.0;
-		for i in 0..10 {
-			println!("{}, {}", i, self.activation_function.func(i as f32));
-		}
 		println!("{}, {}, {}", self.input_layer.len(), self.hidden_layer.size(), self.output_layer.size());
 	}
 }

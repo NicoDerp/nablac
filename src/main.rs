@@ -6,8 +6,8 @@ fn main() {
 		10,
 		Some(6),
 		2,
-		Some(Box::new(neuralnetwork::Sigmoid{}))
+		None
 	);
-	println!("{}", neuralnet);
-	neuralnet.info();
+	println!("{}", neuralnet.get_hidden_weights());
+	println!("{:?}", matrix::Matrix::multiply(neuralnet.get_hidden_weights(), neuralnet.get_inputs()));
 }
