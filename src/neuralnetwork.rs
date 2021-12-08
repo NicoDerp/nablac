@@ -103,12 +103,12 @@ pub struct NeuralNetwork {
 impl NeuralNetwork {
 	pub fn new(layer_neurons: Vec<i32>, func: Option<Box<dyn ActivationFunction>>) -> Self {
 		let mut l = Vec::new();
-		for i in 0..layer_neurons {
-			vec.push(Layer::new(layer_neurons[i]));
+		for i in 0..layer_neurons.len() {
+			l.push(Layer::new(layer_neurons[i]));
 		}
 
-		for mut w = Vec::new();
-		for i in 1..layer_neurons-1 {
+		let mut w = Vec::new();
+		for i in 1..layer_neurons.len()-1 {
 			w.push(Matrix::randomized(layer_neurons[i-1], layer_neurons[i]));
 		}
 
@@ -137,27 +137,29 @@ impl NeuralNetwork {
 
 	// Check with the first sample
 	pub fn next(&mut self, sample: Sample) {
-		if sample.data.len() != self.input_layer.neurons.capacity() {
-			panic!("Sample-length ({}) is not the same as the set input capacity ({})", sample.data.len(),self.input_layer.neurons.capacity());
+		if sample.data.len() != self.layers[0].neurons.capacity() {
+			panic!("Sample-length ({}) is not the same as the set input capacity ({})", sample.data.len(),self.layers[0].neurons.capacity());
 		}
-		//self.input_layer.neurons = sample.data.to_vec();
+		//self.layers[0].neurons = sample.data.to_vec();
 		self.calculate_neurons(sample.data);
 
 		// Cost calculation
 	}
 
 	fn calculate_neurons(&mut self, inputs: Vec<f32>) {
-		self.input_layer.neurons = inputs.clone();
-		self.hidden_layer.neurons = NeuralNetwork::vector_map(
-			&NeuralNetwork::vector_addition(
-				&Matrix::multiply(
-					&self.ih_weights,
-					&self.input_layer.neurons
+		self.layers[0].neurons = inputs.clone();
+		for i in 1..self.layers.len() {
+			self.layers[i].neurons = NeuralNetwork::vector_map(
+				&NeuralNetwork::vector_addition(
+					&Matrix::multiply(
+						&self.weights[i-1],
+						&self.layers[i].neurons
+					),
+					&self.layers[i].biases
 				),
-				&self.hidden_layer.biases
-			),
-		&|x,_| self.activation_function.func(x));
-
+			&|x,_| self.activation_function.func(x));
+		}
+		println!("done");
 		//self.output_layer.neurons = self.activation_function.func(
 		//	NeuralNetwork
 		//);
@@ -185,12 +187,13 @@ impl NeuralNetwork {
 	}
 
 	pub fn info(&mut self) {
-		println!("{}, {}, {}", self.input_layer.size(), self.hidden_layer.size(), self.output_layer.size());
+		println!("Hei");
+		//println!("{}, {}, {}", self.layers[0].size(), self.hidden_layer.size(), self.output_layer.size());
 	}
 }
 
 impl fmt::Display for NeuralNetwork {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "Input-layer size: {}\nHidden-layer size: {}\nOutut-layer size: {}\nActivation function: idk", self.input_layer.size(), self.hidden_layer.size(), self.output_layer.size())
+		write!(f, "Input-layer size: {}\nHidden-layers: {}\nOutut-layer size: {}\nActivation function: idk", self.layers[0].size(), self.layers.len()-2, self.layers[self.layers.len()-1].size())
 	}
 }
