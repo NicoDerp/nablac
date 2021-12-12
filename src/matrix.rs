@@ -12,7 +12,15 @@ impl Matrix {
 		Matrix {
 			rows,
 			columns,
-			data: vec![vec![0.0; rows]; columns],
+			data: vec![vec![1.0; rows]; columns],
+		}
+	}
+
+	pub fn from(data: Vec<Vec<f32>>) -> Self {
+		Matrix {
+			rows: data.len(),
+			columns: data[0].len(),
+			data,
 		}
 	}
 
@@ -24,6 +32,16 @@ impl Matrix {
 			}
 		}
 		return m;
+	}
+
+	pub fn transpose(&self) -> Matrix {
+		let mut m = Matrix::new(self.columns, self.rows);
+		for i in 0..self.columns {
+			for j in 0..self.rows {
+				m.data[j][i] = self.data[i][j]
+			}
+		}
+		m
 	}
 
 	pub fn map(&mut self, f: &dyn Fn(f32, usize, usize) -> f32) -> &Matrix {
@@ -50,7 +68,7 @@ impl Matrix {
 			}
 			vec.push(b[i] * s);
 		}
-		return vec;
+		vec
 	}
 }
 
