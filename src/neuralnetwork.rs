@@ -221,20 +221,28 @@ impl NeuralNetwork {
 			panic!("train function was called, but no dataset is loaded! Use the load_dataset function to load.");
 		}
 
-		let mut dataset = &mut self.dataset.as_ref().unwrap();
+		//let mut samples_len = 0;
+		//{
+		//	let mut dataset = &self.dataset.unwrap();
+		//	samples_len = dataset.samples.len();
+		//}
 		for epoch in 0..epochs {
-			for i in 0..dataset.samples.len() {
-				if dataset.samples[i].data.len() != self.layers[0].neurons.capacity() {
-					panic!("Sample-length ({}) is not the same as the set input capacity ({})", dataset.samples[i].data.len(),self.layers[0].neurons.capacity());
+			for i in 0..self.dataset.as_ref().unwrap().samples.len() {
+				if self.dataset.as_ref().unwrap().samples[i].data.len() != self.layers[0].neurons.capacity() {
+					panic!("Sample-length ({}) is not the same as the set input capacity ({})", self.dataset.as_ref().unwrap().samples[i].data.len(),self.layers[0].neurons.capacity());
 				}
 
-				self.feed_forward(dataset.samples[i]);
+				// Feed forward sample
+				self.layers[0].neurons = self.dataset.as_ref().unwrap().samples[i].data.clone();
+				self.feed_forward();
 
+				println!("i%batch {}", i % batch_size);
 				if i % batch_size == 0 {
+					println!("All samples in batch complete");
 					// Create a 1 hot vector from labels
 					let mut correct_labels = vec![];
-					for j in 0..dataset.labels.len() {
-						if dataset.samples[i].label == dataset.labels[j] {
+					for j in 0..self.dataset.as_ref().unwrap().labels.len() {
+						if self.dataset.as_ref().unwrap().samples[i].label == self.dataset.as_ref().unwrap().labels[j] {
 							correct_labels.push(1.0);
 						} else {
 							correct_labels.push(0.0);
@@ -247,6 +255,8 @@ impl NeuralNetwork {
 						&NeuralNetwork::vector_subtraction(&self.layers[self.layers.len()-1].neurons, &correct_labels),
 						// Derivative, Sigmoid's dfunc = x(1-x)
 						&|x,_| self.activation_function.dfunc(x));
+
+					println!("{:?}", C);
 		
 					// Gradient calculation
 
@@ -256,11 +266,12 @@ impl NeuralNetwork {
 		}
 	}
 
-	fn feed_forward(&mut self, sample: Sample) {
-		self.layers[0].neurons = sample.data;
+	fn feed_forward(&mut self) {//, sample: Sample) {
+		//self.layers[0].neurons = sample.data.clone();
 		for i in 1..self.layers.len() {
-			let mut v = Matrix::multiply(&self.weights[i-1], &self.layers[i-1].neurons);
-			v = NeuralNetwork::vector_addition(&v, &self.layers[i].biases);
+			// Maybe transpose
+			let mut v = Matrix::multiply(&self.weights[i-1].transpose(), &self.layers[i-1].neurons);
+			v = NeuralNetwork::vector_addition(&v, &self.layers[i-1].biases);
 			v = NeuralNetwork::vector_map(&v, &|x,_| self.activation_function.func(x));
 			self.layers[i].neurons = v;
 		}
