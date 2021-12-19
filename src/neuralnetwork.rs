@@ -167,12 +167,14 @@ impl NeuralNetwork {
 	pub fn new(layer_neurons: Vec<i32>, func: Option<Box<dyn ActivationFunction>>) -> Self {
 		let mut l = Vec::new();
 		for i in 0..layer_neurons.len() {
+			println!("Initialized {} neurons", layer_neurons[i]);
 			l.push(Layer::new(layer_neurons[i]));
 		}
 
 		let mut w = Vec::new();
 		for i in 1..layer_neurons.len() {
 			// Randomized
+			println!("Initializing weight {}, with connections from {} to {}", i, layer_neurons[i-1], layer_neurons[i]);
 			w.push(Matrix::new(layer_neurons[i-1].try_into().unwrap(), layer_neurons[i].try_into().unwrap()));
 		}
 
@@ -269,6 +271,8 @@ impl NeuralNetwork {
 	fn feed_forward(&mut self) {//, sample: Sample) {
 		//self.layers[0].neurons = sample.data.clone();
 		for i in 1..self.layers.len() {
+			println!("\nStarted on feed-forwarding layer {}", i);
+			println!("Layer {} has {:?} neurons", i-1, self.layers[i-1].neurons);
 			// Maybe transpose
 			let mut v = Matrix::multiply(&self.weights[i-1].transpose(), &self.layers[i-1].neurons);
 			v = NeuralNetwork::vector_addition(&v, &self.layers[i-1].biases);
