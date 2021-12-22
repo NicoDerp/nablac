@@ -35,14 +35,14 @@ impl Matrix {
 	}
 
 	pub fn transpose(&self) -> Matrix {
-		println!("Before transposing: {}", self);
+		//println!("Before transposing: {}", self);
 		let mut m = Matrix::new(self.columns, self.rows);
 		for i in 0..self.columns {
 			for j in 0..self.rows {
 				m.data[j][i] = self.data[i][j];
 			}
 		}
-		println!("After transposing: {}", m);
+		//println!("After transposing: {}", m);
 		m
 	}
 
@@ -63,16 +63,16 @@ impl Matrix {
 
 	pub fn multiply(m: &Matrix, b: &Vec<f32>) -> Vec<f32> {
 		if m.columns != b.len() {
-			panic!("You are trying to multiply a mtrix bya vector with different sizes! M: {}, b: {}", m.columns, b.len());
+			panic!("You are trying to multiply a matrix by vector with different sizes! M: {}, b: {}", m.columns, b.len());
 		}
 		
 		let mut vec = Vec::with_capacity(m.columns.try_into().unwrap());
-		for i in 0..m.columns {
+		for i in 0..m.rows {
 			let mut s = 0.0;
-			for j in 0..m.rows {
-				s += m.data[i][j];
+			for j in 0..m.columns {
+				s += m.data[j][i] * b[j];
 			}
-			vec.push(b[i] * s);
+			vec.push(s);
 		}
 		vec
 	}

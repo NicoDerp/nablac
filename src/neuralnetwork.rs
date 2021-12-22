@@ -107,7 +107,7 @@ struct Layer {
 	neurons: Vec<f32>,
 	// The biases for the individual neurons
 	biases: Vec<f32>,
-	// Size of neurons
+	// Size of the layer
 	size: i32,
 }
 
@@ -146,11 +146,7 @@ impl Dataset {
 pub struct NeuralNetwork {
 	layers: Vec<Layer>,
 	weights: Vec<Matrix>,
-	//input_layer: Layer,
-	//ih_weights: Matrix,
-	//hidden_layer: Layer,
-	//ho_weights: Matrix,
-	//output_layer: Layer,
+	alpha: f32,
 	dataset: Option<Dataset>,
 	activation_function: Box<dyn ActivationFunction>,
 }
@@ -164,7 +160,7 @@ pub struct NeuralNetwork {
  * @body Many different types. https://iamtrask.github.io/2015/07/27/python-network-part2/
  */
 impl NeuralNetwork {
-	pub fn new(layer_neurons: Vec<i32>, func: Option<Box<dyn ActivationFunction>>) -> Self {
+	pub fn new(layer_neurons: Vec<i32>, alpha: f32, func: Option<Box<dyn ActivationFunction>>) -> Self {
 		let mut l = Vec::new();
 		for i in 0..layer_neurons.len() {
 			l.push(Layer::new(layer_neurons[i]));
@@ -179,6 +175,7 @@ impl NeuralNetwork {
 		NeuralNetwork {
 			layers: l,
 			weights: w,
+			alpha,
 			dataset:None,
 			activation_function: func.unwrap_or(Box::new(ReLU{})),
 		}
@@ -232,31 +229,36 @@ impl NeuralNetwork {
 					panic!("Sample-length ({}) is not the same as the set input capacity ({})", self.dataset.as_ref().unwrap().samples[i].data.len(),self.layers[0].neurons.capacity());
 				}
 
-				// Feed forward sample
+				// Set input-layer to sample data
 				self.layers[0].neurons = self.dataset.as_ref().unwrap().samples[i].data.clone();
+				// Feed forward sample
 				self.feed_forward();
 
+				// Create a 1 hot vector from labels
+				let mut correct_labels = vec![];
+				for j in 0..self.dataset.as_ref().unwrap().labels.len() {
+					if self.dataset.as_ref().unwrap().samples[i].label == self.dataset.as_ref().unwrap().labels[j] {
+						correct_labels.push(1.0);
+					} else {
+						correct_labels.push(0.0);
+					}
+				}
+				
+				// Cost calculation
+				let C = NeuralNetwork::vector_map(
+					// Output layer - labels
+					&NeuralNetwork::vector_subtraction(&self.layers[self.layers.len()-1].neurons, &correct_labels),
+					// Derivative, Sigmoid's dfunc = x(1-x)
+					&|x,_| self.activation_function.dfunc(x));
+
+				println!("Cost {:?}", C);
+
+
 				println!("i%batch {}", i % batch_size);
+				println!("i {}", i);
+				println!("batch {}", batch_size);
 				if i % batch_size == 0 {
 					println!("All samples in batch complete");
-					// Create a 1 hot vector from labels
-					let mut correct_labels = vec![];
-					for j in 0..self.dataset.as_ref().unwrap().labels.len() {
-						if self.dataset.as_ref().unwrap().samples[i].label == self.dataset.as_ref().unwrap().labels[j] {
-							correct_labels.push(1.0);
-						} else {
-							correct_labels.push(0.0);
-						}
-					}
-					
-					// Cost calculation
-					let C = NeuralNetwork::vector_map(
-						// Output layer - labels
-						&NeuralNetwork::vector_subtraction(&self.layers[self.layers.len()-1].neurons, &correct_labels),
-						// Derivative, Sigmoid's dfunc = x(1-x)
-						&|x,_| self.activation_function.dfunc(x));
-
-					println!("{:?}", C);
 		
 					// Gradient calculation
 
@@ -266,12 +268,10 @@ impl NeuralNetwork {
 		}
 	}
 
-	fn feed_forward(&mut self) {//, sample: Sample) {
-		//self.layers[0].neurons = sample.data.clone();
+	fn feed_forward(&mut self) {
 		for i in 1..self.layers.len() {
-			// Maybe transpose
 			let mut v = Matrix::multiply(&self.weights[i-1].transpose(), &self.layers[i-1].neurons);
-			v = NeuralNetwork::vector_addition(&v, &self.layers[i-1].biases);
+			v = NeuralNetwork::vector_addition(&v, &self.layers[i].biases);
 			v = NeuralNetwork::vector_map(&v, &|x,_| self.activation_function.func(x));
 			self.layers[i].neurons = v;
 		}

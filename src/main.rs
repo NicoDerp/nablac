@@ -10,6 +10,7 @@ mod matrix;
 fn main() {
 	let mut neuralnet = neuralnetwork::NeuralNetwork::new(
 		vec![3, 2, 4],
+		1.0,
 		Some(Box::from(neuralnetwork::Linear{}))
 	);
 
