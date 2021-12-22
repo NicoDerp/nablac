@@ -9,7 +9,6 @@ pub struct Matrix {
 
 impl Matrix {
 	pub fn new(rows: usize, columns: usize) -> Self {
-		println!("\nNew matrix with {} rows and {} columns\n", rows, columns);
 		Matrix {
 			rows,
 			columns,
@@ -64,11 +63,7 @@ impl Matrix {
 
 	pub fn multiply(m: &Matrix, b: &Vec<f32>) -> Vec<f32> {
 		if m.columns != b.len() {
-<<<<<<< HEAD
 			panic!("You are trying to multiply a matrix by vector with different sizes! M: {}, b: {}", m.columns, b.len());
-=======
-			panic!("You are trying to multiply a matrix by a vector with different sizes! M: {}, b: {}", m.columns, b.len());
->>>>>>> d6ac0ca5e73814c550855ae888442fedcfa62a0e
 		}
 		
 		let mut vec = Vec::with_capacity(m.columns.try_into().unwrap());
