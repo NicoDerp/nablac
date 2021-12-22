@@ -9,14 +9,18 @@ mod matrix;
  */
 fn main() {
 	let mut neuralnet = neuralnetwork::NeuralNetwork::new(
+<<<<<<< HEAD
 		vec![3, 2, 4],
 		1.0,
+=======
+		vec![1, 2, 3, 4],
+>>>>>>> d6ac0ca5e73814c550855ae888442fedcfa62a0e
 		Some(Box::from(neuralnetwork::Linear{}))
 	);
 
 	let samples = vec![
-		neuralnetwork::Sample::new(vec![1.0, 3.0, 2.0], String::from("3")),
-		neuralnetwork::Sample::new(vec![3.0, 1.0, 4.0], String::from("4")),
+		neuralnetwork::Sample::new(vec![1.0], String::from("3")),
+		neuralnetwork::Sample::new(vec![3.0], String::from("4")),
 	];
 	let dataset = neuralnetwork::Dataset::new(
 		samples,
